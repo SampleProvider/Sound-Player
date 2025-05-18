@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Audio Player</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div id="currSongContainer">
+        <div id="currSongName">Test song</div>
+        <div id="currSongArtist">Test artist</div>
+        <button id="currSongPlayButton"></button>
+        <div id="currSongTime">1:00</div>
+        <div id="currSongLength">3:00</div>
+        <input type="range" id="currSongProgress" min="0"></input>
+    </div>
+    <div id="playlistContainer">
+        <div id="playlistName">
+            <span>Test playlist</span>
+            <button id="playlistEditButton"></button>
+        </div>
+        <div id="playlistDescription">Test description</div>
+        <div id="playlistSettings">
+            <div id="volumeSettings">
+                <button id="volumeButton"></button>
+                <input type="range" id="volumeSlider" min="0" max="200"></input>
+            </div>
+            <input type="checkbox" id="shuffleButton" title="Shuffle songs">
+            <input type="checkbox" id="loopButton" title="Loop current song">
+            <input type="checkbox" id="autoplayButton" title="Autoplay songs">
+            <button id="uploadButton" title="Upload playlist"></button>
+        </div>
+        <div id="playlistSongs">
+            <div class="song">
+                <div class="songName">
+                    <span>Test song 2</span>
+                    <button class="songEditButton"></button>
+                </div>
+                <div class="songArtist">Test artist 2</div>
+                <div class="songLength">3:00</div>
+                <button class="songPlayButton"></button>
+            </div>
+        </div>
+    </div>
+    <dialog id="modalContainer">
+        <div id="modalTitle"></div>
+        <div id="modalContent"></div>
+        <div id="modalInputs">
+            <label id="modalLabel1" for="modalInput1"></label>
+            <input type="text" id="modalInput1" class="modalInput">
+            <label id="modalLabel2" for="modalInput2"></label>
+            <input type="text" id="modalInput2" class="modalInput">
+        </div>
+        <div id="modalButtons" style="display: flex; justify-content: center;">
+            <button id="modalYes" class="modalButton button">Yes</button>
+            <button id="modalNo" class="modalButton button">No</button>
+            <button id="modalOk" class="modalButton button">Ok</button>
+        </div>
+    </dialog>
+    <template id="songTemplate">
+        <div class="song">
+            <div class="songName">
+                <span></span>
+                <button class="songEditButton"></button>
+            </div>
+            <div class="songArtist"></div>
+            <div class="songLength"></div>
+            <button class="songPlayButton"></button>
+        </div>
+    </template>
+    <div id="playlistButtons"></div>
+    <script src="index.js" type="module" defer></script>
+</body>
+
+</html>
