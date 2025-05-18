@@ -74,6 +74,80 @@ const audioCtx = new AudioContext();
 const globalGain = audioCtx.createGain();
 globalGain.connect(audioCtx.destination);
 
+let settings = {
+    volume: 100,
+    lazyRead: false,
+    autoplay: false,
+    loop: false,
+    shuffle: false,
+};
+
+try {
+    let json = JSON.parse(localStorage.getItem("settings"));
+    for (let i in settings) {
+        if (typeof settings[i] == typeof json[i]) {
+            settings[i] = json[i];
+        }
+    }
+}
+catch (err) {
+
+}
+window.addEventListener("beforeunload", function() {
+    localStorage.setItem("settings", JSON.stringify(settings));
+});
+
+lazyReadButton.oninput = function() {
+    settings.lazyRead = lazyReadButton.checked;
+};
+lazyReadButton.checked = settings.lazyRead;
+autoplayButton.oninput = function() {
+    settings.autoplay = autoplayButton.checked;
+};
+autoplayButton.checked = settings.autoplay;
+loopButton.oninput = function() {
+    settings.loop = loopButton.checked;
+};
+loopButton.checked = settings.loop;
+shuffleButton.oninput = function() {
+    settings.shuffle = shuffleButton.checked;
+};
+shuffleButton.checked = settings.shuffle;
+volumeButton.onclick = function() {
+    if (volumeSlider.value != 0) {
+        volumeSlider.value = 0;
+    }
+    else {
+        volumeSlider.value = 100;
+    }
+    volumeSlider.oninput();
+};
+volumeSlider.oninput = function() {
+    settings.volume = Number(volumeSlider.value);
+    globalGain.gain.value = settings.volume / 100;
+    volumeSlider.title = settings.volume + "%";
+    if (settings.volume == 0) {
+        volumeButton.style.backgroundImage = "url(\"/images/volume-mute.svg\")";
+    }
+    else if (settings.volume <= 33) {
+        volumeButton.style.backgroundImage = "url(\"/images/volume0.svg\")";
+    }
+    else if (settings.volume <= 66) {
+        volumeButton.style.backgroundImage = "url(\"/images/volume1.svg\")";
+    }
+    else {
+        volumeButton.style.backgroundImage = "url(\"/images/volume2.svg\")";
+    }
+    if (settings.volume == 0) {
+        volumeButton.title = "Unmute volume";
+    }
+    else {
+        volumeButton.title = "Mute volume";
+    }
+};
+volumeSlider.value = settings.volume;
+volumeSlider.oninput();
+
 let playlist = null;
 let currSong = null;
 
@@ -99,9 +173,13 @@ class Song {
     length = 0;
     metadataHandle = null;
     buffer = null;
+    bufferData = null;
+    readingBuffer = false;
+    readBuffer = false;
     source = null;
     startTime = 0;
     currTime = 0;
+    playing = false;
     div = null;
     constructor(data, metadata, metadataHandle) {
         this.metadataHandle = metadataHandle;
@@ -131,19 +209,31 @@ class Song {
                 this.start();
             }
         };
-        this.loadData(data);
+        this.bufferData = data;
+        if (!settings.lazyRead) {
+            this.loadData(data);
+        }
         this.loadMetadata(metadata);
     }
     loadData(data) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const arrayBuffer = e.target.result;
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            this.buffer = audioBuffer;
-            this.length = this.buffer.duration;
-            this.updateDiv();
-        };
-        reader.readAsArrayBuffer(data);
+        return new Promise((resolve) => {
+            this.readingBuffer = true;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const arrayBuffer = e.target.result;
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                this.buffer = audioBuffer;
+                this.length = this.buffer.duration;
+                if (!this.readBuffer) {
+                    this.writeMetadata();
+                }
+                this.readingBuffer = false;
+                this.readBuffer = true;
+                this.updateDiv();
+                resolve();
+            };
+            reader.readAsArrayBuffer(data);
+        });
     }
     loadMetadata(data) {
         const reader = new FileReader();
@@ -153,8 +243,11 @@ class Song {
                 if (json.name == null) {
                     json.name = data.name.split(".")[0];
                 }
-                this.name = json.name;
-                this.artist = json.artist;
+                this.name = json.name ?? "Untitled";
+                this.artist = json.artist ?? "No artist";
+                if (!this.readBuffer && !isNaN(json.length)) {
+                    this.length = json.length;
+                }
             }
             catch (err) {
                 this.name = data.name.split(".")[0];
@@ -168,6 +261,7 @@ class Song {
         await writable.write(JSON.stringify({
             name: this.name,
             artist: this.artist,
+            length: this.length,
         }));
         await writable.close();
     }
@@ -186,9 +280,18 @@ class Song {
         currSongProgress.max = this.length;
     }
 
-    start() {
+    async start() {
+        this.playing = true;
         if (this.buffer == null) {
-            return;
+            if (!this.readingBuffer) {
+                await this.loadData(this.bufferData);
+                if (!this.playing) {
+                    return;
+                }
+            }
+            else {
+                return;
+            }
         }
         if (this.source == null) {
             this.source = new AudioBufferSourceNode(audioCtx, {
@@ -205,10 +308,10 @@ class Song {
         this.source.start(0, this.currTime);
         this.source.onended = () => {
             this.stop();
-            if (loopButton.checked) {
+            if (settings.loop) {
                 this.start();
             }
-            else if (autoplayButton.checked) {
+            else if (settings.autoplay) {
                 let index = playlist.songs.indexOf(this);
                 let nextSong = playlist.songs[(index + 1) % playlist.songs.length];
                 if (nextSong != currSong) {
@@ -219,7 +322,7 @@ class Song {
                 }
                 nextSong.start();
             }
-            else if (shuffleButton.checked) {
+            else if (settings.shuffle) {
                 let index = Math.floor(Math.random() * (playlist.songs.length - 1));
                 if (index >= playlist.songs.indexOf(this)) {
                     index += 1;
@@ -244,6 +347,7 @@ class Song {
         }
     }
     stop() {
+        this.playing = false;
         if (this.source == null) {
             return;
         }
@@ -251,6 +355,9 @@ class Song {
         this.source.stop();
         this.source.disconnect();
         this.source = null;
+        if (settings.lazyRead) {
+            this.buffer = null;
+        }
         this.currTime = audioCtx.currentTime - this.startTime;
         this.div.querySelector(".songPlayButton").classList.remove("playing");
         if (this == currSong) {
@@ -284,11 +391,11 @@ class Playlist {
         reader.onload = async (e) => {
             try {
                 const json = JSON.parse(e.target.result);
-                this.name = json.name;
-                this.description = json.description;
+                this.name = json.name ?? "Untitled";
+                this.description = json.description ?? "No description";
             }
             catch (err) {
-
+                this.name = data.name;
             }
             this.updateDiv();
         };
@@ -340,32 +447,6 @@ playlistEditButton.onclick = async function() {
         playlist.writeMetadata();
     }
 };
-volumeButton.onclick = function() {
-    if (volumeSlider.value != 0) {
-        volumeSlider.value = 0;
-    }
-    else {
-        volumeSlider.value = 100;
-    }
-    volumeSlider.oninput();
-};
-volumeSlider.oninput = function() {
-    globalGain.gain.value = Number(volumeSlider.value) / 100;
-    volumeSlider.title = volumeSlider.value + "%";
-    if (volumeSlider.value == 0) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume-mute.svg\")";
-    }
-    else if (volumeSlider.value <= 33) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume0.svg\")";
-    }
-    else if (volumeSlider.value <= 66) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume1.svg\")";
-    }
-    else {
-        volumeButton.style.backgroundImage = "url(\"/images/volume2.svg\")";
-    }
-};
-volumeSlider.oninput();
 uploadButton.onclick = async function() {
     let directoryHandle = await window.showDirectoryPicker({
         id: "audioPlayer",
@@ -505,6 +586,7 @@ function update() {
         }
         currSongTime.innerText = stringifyTime(Math.floor(time));
         currSongProgress.value = time;
+        currSongProgress.title = stringifyTime(Math.floor(time)) + "/" + stringifyTime(Math.floor(currSong.length));
         if (mediaSessionEnabled) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: currSong.name,

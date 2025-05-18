@@ -12,7 +12,7 @@
     <div id="currSongContainer">
         <div id="currSongName">Test song</div>
         <div id="currSongArtist">Test artist</div>
-        <button id="currSongPlayButton"></button>
+        <button id="currSongPlayButton" title="Play song"></button>
         <div id="currSongTime">1:00</div>
         <div id="currSongLength">3:00</div>
         <input type="range" id="currSongProgress" min="0"></input>
@@ -20,28 +20,29 @@
     <div id="playlistContainer">
         <div id="playlistName">
             <span>Test playlist</span>
-            <button id="playlistEditButton"></button>
+            <button id="playlistEditButton" title="Edit playlist"></button>
         </div>
         <div id="playlistDescription">Test description</div>
         <div id="playlistSettings">
             <div id="volumeSettings">
-                <button id="volumeButton"></button>
+                <button id="volumeButton" title="Mute volume"></button>
                 <input type="range" id="volumeSlider" min="0" max="200"></input>
             </div>
             <input type="checkbox" id="shuffleButton" title="Shuffle songs">
             <input type="checkbox" id="loopButton" title="Loop current song">
             <input type="checkbox" id="autoplayButton" title="Autoplay songs">
             <button id="uploadButton" title="Upload playlist"></button>
+            <input type="checkbox" id="lazyReadButton" title="Lazy file reading">
         </div>
         <div id="playlistSongs">
             <div class="song">
                 <div class="songName">
                     <span>Test song 2</span>
-                    <button class="songEditButton"></button>
+                    <button class="songEditButton" title="Edit song"></button>
                 </div>
                 <div class="songArtist">Test artist 2</div>
                 <div class="songLength">3:00</div>
-                <button class="songPlayButton"></button>
+                <button class="songPlayButton" title="Play song"></button>
             </div>
         </div>
     </div>
@@ -64,11 +65,11 @@
         <div class="song">
             <div class="songName">
                 <span></span>
-                <button class="songEditButton"></button>
+                <button class="songEditButton" title="Edit song"></button>
             </div>
             <div class="songArtist"></div>
             <div class="songLength"></div>
-            <button class="songPlayButton"></button>
+            <button class="songPlayButton" title="Play song"></button>
         </div>
     </template>
     <div id="playlistButtons"></div>

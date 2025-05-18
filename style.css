@@ -113,7 +113,7 @@ body {
     height: calc(20px - var(--border-size) * 4);
     background-color: dodgerblue;
 }
-#playlistEditButton, .songEditButton, #volumeButton, #uploadButton, #autoplayButton, #loopButton, #shuffleButton {
+#playlistEditButton, .songEditButton, #volumeButton, #lazyReadButton, #uploadButton, #autoplayButton, #loopButton, #shuffleButton {
     appearance: none;
     width: 20px;
     height: 20px;
@@ -131,6 +131,12 @@ body {
     float: none;
     background-image: url("/images/save.svg");
 }
+#lazyReadButton {
+    background-image: url("/images/lazy-read.svg");
+    background-size: 75%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 #uploadButton {
     background-image: url("/images/upload.svg");
 }
@@ -143,7 +149,7 @@ body {
 #shuffleButton {
     background-image: url("/images/shuffle.svg");
 }
-#autoplayButton:checked, #loopButton:checked, #shuffleButton:checked {
+#lazyReadButton:checked, #autoplayButton:checked, #loopButton:checked, #shuffleButton:checked {
     background-color: dodgerblue;
 }
 #shuffleButton:disabled {
