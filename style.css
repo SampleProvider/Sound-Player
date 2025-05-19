@@ -129,25 +129,25 @@ body {
 }
 #playlistEditButton, .songEditButton {
     float: none;
-    background-image: url("/images/save.svg");
+    background-image: url("/img/save.svg");
 }
 #lazyReadButton {
-    background-image: url("/images/lazy-read.svg");
+    background-image: url("/img/lazy-read.svg");
     background-size: 75%;
     background-repeat: no-repeat;
     background-position: center;
 }
 #uploadButton {
-    background-image: url("/images/upload.svg");
+    background-image: url("/img/upload.svg");
 }
 #autoplayButton {
-    background-image: url("/images/autoplay.svg");
+    background-image: url("/img/autoplay.svg");
 }
 #loopButton {
-    background-image: url("/images/loop.svg");
+    background-image: url("/img/loop.svg");
 }
 #shuffleButton {
-    background-image: url("/images/shuffle.svg");
+    background-image: url("/img/shuffle.svg");
 }
 #lazyReadButton:checked, #autoplayButton:checked, #loopButton:checked, #shuffleButton:checked {
     background-color: dodgerblue;
@@ -210,11 +210,11 @@ body {
     background-size: 50%;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url("/images/play.svg");
+    background-image: url("/img/play.svg");
 }
 #currSongPlayButton.playing, .songPlayButton.playing {
     background-color: red;
-    background-image: url("/images/pause.svg");
+    background-image: url("/img/pause.svg");
 }
 
 

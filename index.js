@@ -127,16 +127,16 @@ volumeSlider.oninput = function() {
     globalGain.gain.value = settings.volume / 100;
     volumeSlider.title = settings.volume + "%";
     if (settings.volume == 0) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume-mute.svg\")";
+        volumeButton.style.backgroundImage = "url(\"/img/volume-mute.svg\")";
     }
     else if (settings.volume <= 33) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume0.svg\")";
+        volumeButton.style.backgroundImage = "url(\"/img/volume0.svg\")";
     }
     else if (settings.volume <= 66) {
-        volumeButton.style.backgroundImage = "url(\"/images/volume1.svg\")";
+        volumeButton.style.backgroundImage = "url(\"/img/volume1.svg\")";
     }
     else {
-        volumeButton.style.backgroundImage = "url(\"/images/volume2.svg\")";
+        volumeButton.style.backgroundImage = "url(\"/img/volume2.svg\")";
     }
     if (settings.volume == 0) {
         volumeButton.title = "Unmute volume";
