@@ -374,9 +374,9 @@ class Playlist {
     description = "No description";
     metadataHandle = null;
     songs = [];
-    constructor(metadata, metadataHandle) {
+    constructor(directoryHandle, metadata, metadataHandle) {
         this.metadataHandle = metadataHandle;
-        this.loadMetadata(metadata);
+        this.loadMetadata(directoryHandle, metadata);
     }
     async addSong(data, metadataHandle, metadata) {
         let song = new Song(data, metadataHandle, metadata);
@@ -386,7 +386,7 @@ class Playlist {
             song.updateCurrSongDiv();
         }
     }
-    loadMetadata(data) {
+    loadMetadata(directoryHandle, data) {
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
@@ -395,7 +395,8 @@ class Playlist {
                 this.description = json.description ?? "No description";
             }
             catch (err) {
-                this.name = data.name;
+                // this is so spaghetti there has to be a better way
+                this.name = directoryHandle.name;
             }
             this.updateDiv();
         };
@@ -460,7 +461,7 @@ uploadButton.onclick = async function() {
         currSong.stop();
     }
     playlistSongs.innerHTML = "";
-    playlist = new Playlist(await metadataHandle.getFile(), metadataHandle);
+    playlist = new Playlist(directoryHandle, await metadataHandle.getFile(), metadataHandle);
     currSong = null;
     async function* getFilesRecursively(entry, dir) {
         if (entry.kind == "file") {
