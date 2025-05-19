@@ -346,7 +346,7 @@ class Song {
             navigator.mediaSession.playbackState = "playing";
         }
     }
-    stop() {
+    stop(preventBufferDeletion) {
         this.playing = false;
         if (this.source == null) {
             return;
@@ -355,7 +355,8 @@ class Song {
         this.source.stop();
         this.source.disconnect();
         this.source = null;
-        if (settings.lazyRead) {
+        if (settings.lazyRead && !preventBufferDeletion) {
+            // preventBufferDeletion also kind of spaghetti
             this.buffer = null;
         }
         this.currTime = audioCtx.currentTime - this.startTime;
@@ -429,7 +430,7 @@ currSongPlayButton.onclick = function() {
 currSongProgress.oninput = function() {
     if (currSong != null) {
         if (currSong.source != null) {
-            currSong.stop();
+            currSong.stop(true);
             currSong.currTime = currSongProgress.value;
             currSong.start();
         }
