@@ -307,11 +307,13 @@ class Song {
         }
         this.source.start(0, this.currTime);
         this.source.onended = () => {
-            this.stop();
             if (settings.loop) {
+                this.stop(true);
+                this.currTime = 0;
                 this.start();
             }
             else if (settings.autoplay) {
+                this.stop();
                 let index = playlist.songs.indexOf(this);
                 let nextSong = playlist.songs[(index + 1) % playlist.songs.length];
                 if (nextSong != currSong) {
@@ -323,6 +325,7 @@ class Song {
                 nextSong.start();
             }
             else if (settings.shuffle) {
+                this.stop();
                 let index = Math.floor(Math.random() * (playlist.songs.length - 1));
                 if (index >= playlist.songs.indexOf(this)) {
                     index += 1;
