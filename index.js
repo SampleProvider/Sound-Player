@@ -480,13 +480,20 @@ uploadButton.onclick = async function() {
             }
         }
     }
+    let files = [];
     for await (const file of getFilesRecursively(directoryHandle, directoryHandle)) {
         if (file.type.startsWith("audio")) {
-            let metadataHandle = await file.dir.getFileHandle(file.name + ".json", {
-                create: true,
-            });
-            playlist.addSong(file, await metadataHandle.getFile(), metadataHandle);
+            files.push(file);
         }
+    }
+    files.sort(function(a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    });
+    for (let file of files) {
+        let metadataHandle = await file.dir.getFileHandle(file.name + ".json", {
+            create: true,
+        });
+        playlist.addSong(file, await metadataHandle.getFile(), metadataHandle);
     }
     if (playlist.songs.length <= 1) {
         shuffleButton.disabled = true;
